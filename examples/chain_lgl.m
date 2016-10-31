@@ -110,10 +110,6 @@ fwpw_dg=hist.dg;
 fwpw_tt=hist.tt;
 fprintf(['FWpw solution is ' num2str(sum(x_sol~=0)) '-sparse\n'])
 
-
-
-
-
 %% Duality Gap Figure
 
 xplot{1}=fw_tt;
@@ -135,7 +131,7 @@ for i=1:4
 loglog(xplot{i},yplot{i},'-','LineWidth',2,'Color',colors(i,:),'DisplayName',legendStr{i}); 
 hold on
 end
-title('duality gap lgl');
+title('duality gap chain lgl regularized');
 legend('show','Location','southwest');
 grid on
 hold off
