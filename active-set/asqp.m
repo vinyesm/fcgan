@@ -25,7 +25,7 @@ function [c,A,nbpivot]=asqp(Q,b,c0,param,new_atom_added)
 %
 %%%%%%%%%%%%
 %
-% Active-set algorithm from 
+% Active-set algorithm from
 % Numerical Optimization - J.Nocedal & S.J.Wright
 %
 % Marina Vinyes and Guillaume Obozinski, 2016
@@ -41,10 +41,19 @@ t=size(c0,1);
 c=full(c0);
 g=Q*c-b;
 A=(c>tol); % active atoms
-if new_atom_added,
-    A(end)=true; % adding the last one
-    if g(end)>0,
-        error('The new atom direction is not a descent direction')
+if param.ws
+    if new_atom_added,
+        A(end)=true; % adding the last one
+        if g(end)>0,
+            error('The new atom direction is not a descent direction')
+        end
+    end
+else
+    if(any(g<-tol))
+        [~,j]=min(g);
+        A(j)=true;
+    else
+        error('No direction added')
     end
 end
 
@@ -56,7 +65,7 @@ if debug_mode,
     hist.obj=zeros(1,max_iter);
     hist.J=zeros(t,max_iter);
     hist.c=zeros(t,max_iter);
-    hist.r=zeros(1,max_iter); 
+    hist.r=zeros(1,max_iter);
     obj_old=0.5*c'*Q*c-c'*b;
 end
 
@@ -96,7 +105,7 @@ while(iter<=max_iter)
         g=Q*c-b;
         nb_full_steps=nb_full_steps+1;
         %fprintf('+')
-        if nb_full_steps>10,
+        if param.ws && nb_full_steps>10,
             break;
         end
         if(any(g<-tol & ~A))

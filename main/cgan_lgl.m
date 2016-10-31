@@ -37,8 +37,14 @@ function [x, as, hist, iter] = cgan_lgl(D,y,param)
 
 
 param_as.debug_mode= false;
-param_as.max_iter= 100;
+
 param_as.epsilon= 1e-10;
+param_as.ws=param.ws;
+if param.ws
+    param_as.max_iter= 1000;
+else
+    param_as.max_iter= 100;
+end
 
 if param.flag_no_design,
     p=length(y);
@@ -100,7 +106,11 @@ while(iter<max_nb_iter),
                 else
                     b=as.DA(:,1:atom_count)'*y-lambda*ones(atom_count,1);
                 end
-                [coeffs,Jset,npiv]=asqp(H(1:atom_count,1:atom_count)+1e-12*eye(atom_count),b,coeffs_ws,param_as,new_atom_added);
+                if param.ws
+                    [coeffs,Jset,npiv]=asqp(H(1:atom_count,1:atom_count)+1e-10*eye(atom_count),b,coeffs_ws,param_as,new_atom_added);
+                else
+                    [coeffs,Jset,npiv]=asqp(H(1:atom_count,1:atom_count)+1e-10*eye(atom_count),b,zeros(atom_count,1),param_as,new_atom_added);
+                end
                 % Hard threshold small negative values
                 smallValues=find(coeffs<0); % for numerical issues
                 coeffs(smallValues)=zeros(length(smallValues),1);

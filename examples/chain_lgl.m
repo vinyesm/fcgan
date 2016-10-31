@@ -64,6 +64,7 @@ max_iter_fw=500;
 param.epsStop=1e-5;
 param.debug=false;
 param.lmo=@lmo_chain_lgl;
+param.ws=1;
 
 %% experiments
 
