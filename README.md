@@ -9,3 +9,5 @@ where $X$ is a design matrix and $\gamma_{\mathcal{A}}$ the Latent Group Lasso(L
 We also considered the constrained version for LGL
 
 $$\min_{x}\frac{1}{2}\|Xw-y\|^2 \quad \st \quad \Olgl(w)\leq\rho. $$
+
+$$I = \int \rho R^{2} dV$$
