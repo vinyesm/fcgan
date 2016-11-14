@@ -99,18 +99,11 @@ while(iter<max_nb_iter),
             case 'asqp'
                 % call bcmm, output x, d and the dual variable gamma 
                 [coeffs, x, gamma, niter]=bcmm_tr_l1(coeffs_ws, x_ws, gamm_ws, param_bcmm, param);
-                
-                H=as.atoms(:,1:atom_count)'*as.atoms(:,1:atom_count);
-                b=as.atoms(:,1:atom_count)'*y-lambda*ones(atom_count,1);
-                if param.ws
-                    [coeffs,Jset,npiv]=asqp(H(1:atom_count,1:atom_count)+1e-10*eye(atom_count),b,coeffs_ws,param_as,new_atom_added);
-                else
-                    [coeffs,Jset,npiv]=asqp(H(1:atom_count,1:atom_count)+1e-10*eye(atom_count),b,zeros(atom_count,1),param_as,new_atom_added);
-                end
                 % Hard threshold small negative values
                 smallValues=find(coeffs<0); % for numerical issues
                 coeffs(smallValues)=zeros(length(smallValues),1);
                 %manage H and the set of atoms
+                Jset=smallValues;
                 atom_count=sum(Jset);
                 H=H(Jset,Jset);
                 as.atoms(:,1:atom_count)=as.atoms(:,Jset);
@@ -128,8 +121,7 @@ while(iter<max_nb_iter),
     iter=iter+1;
     
     %% Compute gradient
-    g=x-y;
-    
+    g=x-y;    
     
     
     %% Compute objective, loss and penalty
