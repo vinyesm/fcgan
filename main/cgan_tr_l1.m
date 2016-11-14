@@ -98,7 +98,7 @@ while(iter<max_nb_iter),
         switch param.method,
             case 'asqp'
                 % call bcmm, output x, d and the dual variable gamma 
-                [coeffs, x, gamma, niter]=bcmm_tr_l1(coeffs_ws, x_ws, gamm_ws, param_bcmm, param);
+                [coeffs, x, gamma, niter]=as_tr_l1(coeffs_ws, x_ws, gamm_ws, param_bcmm, param);
                 % Hard threshold small negative values
                 smallValues=find(coeffs<0); % for numerical issues
                 coeffs(smallValues)=zeros(length(smallValues),1);
@@ -144,7 +144,7 @@ while(iter<max_nb_iter),
         active_var(iter)=sum(as.coeffs>0);
     end
     
-    %% Get new atom
+    %% Get new atom (from dual variable gamma)
     
     [maxval,new_atom]=feval(param.lmo,-g,param);
     
