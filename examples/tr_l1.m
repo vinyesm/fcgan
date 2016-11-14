@@ -30,6 +30,7 @@ n=20;
 p=100;
 sigma=0;
 lambda=.1;
+mu=.1;
 
 %% block diagonal covariance with 5 blocks of different sizes
 block_sz=[30 20 15 10 10 5 5 5];
@@ -59,9 +60,19 @@ out_cndg.cpu=[];
 mu = zeros(1,p); % vector of means
 Y = mvnrnd(mu, C+sigma^2*eye(p), n)';
 S=cov(Y');
-inputData.Y=S;
-inputData.X1=eye(p);
-inputData.X2=eye(p);
+
+%%
+%% fcgan
+param.method='asqp';
+param.lambda=lambda;
+param.mu=mu;
+param.max_nb_atoms=500; % Right now the code assumes that both are the same
+param.max_nb_iter=500;
+max_iter_fw=500;
+param.epsStop=1e-5;
+param.debug=false;
+param.lmo=@lmo_chain_lgl;
+param.ws=1;
 
 %%
 figure(1);
@@ -93,6 +104,10 @@ set(gca,'xtick',[])
 caxis([0, 0.3]);
 colorbar;
 pbaspect([(2*100+5)/100 1 1]);
+
+%% algorithm
+[x, as, hist, iter] = cgan_tr_l1(S,param);
+
 
 
 % %% param
