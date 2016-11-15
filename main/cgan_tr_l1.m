@@ -168,7 +168,7 @@ while(iter<max_nb_iter),
         % Inserting the new atom
         as.atoms(:,atom_count)=new_atom;
         
-        if full(new_atom)'*(g+lmabda*sign(x))>0,
+        if full(new_atom)'*(g+lambda*sign(x))>0,
             error('new atom wrong');
         end
         new_atom_added=true;
