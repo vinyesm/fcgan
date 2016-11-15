@@ -53,7 +53,7 @@ while(iter<=max_iter)
 %     end
     d=zeros(t,1);
 %     d(A)=Q(A,A)\b(A);
-    [d(A), xA, gamma, r]=bcmm_tr_l1(y,atoms(:,A),zeros(sum(A),1),zeros(t,1), y, param_bcmm);
+    [d(A), xA, gamma, r]=bcmm_tr_l1(y,atoms(:,A),zeros(sum(A),1),zeros(size(y,1),1), y, param_bcmm);
     %% Progress until active set reduces
     dotprods= sum(bsxfun(@times,atoms,gamma));
     [res, i_remove]=max(dotprods);

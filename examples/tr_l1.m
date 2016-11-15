@@ -106,7 +106,7 @@ colorbar;
 pbaspect([(2*100+5)/100 1 1]);
 
 %% algorithm
-[x, as, hist, iter] = cgan_tr_l1(S,param);
+[x, as, hist, iter] = cgan_tr_l1(C,param);
 
 
 
