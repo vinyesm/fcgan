@@ -29,8 +29,8 @@ addpath('../other');
 n=20;
 p=100;
 sigma=0;
-lambda=.1;
-mu=.1;
+lambda=1;
+mu=1;
 
 %% block diagonal covariance with 5 blocks of different sizes
 block_sz=[30 20 15 10 10 5 5 5];
@@ -57,8 +57,8 @@ out_bcd.cpu=[];
 out_cndg.cpu=[];
 
 %% data
-mu = zeros(1,p); % vector of means
-Y = mvnrnd(mu, C+sigma^2*eye(p), n)';
+moy = zeros(1,p); % vector of means
+Y = mvnrnd(moy, C+sigma^2*eye(p), n)';
 S=cov(Y');
 
 %%

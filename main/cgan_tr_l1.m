@@ -35,11 +35,11 @@ function [x, as, hist, iter] = cgan_tr_l1(y,param)
 % %%%%%%%%%%%%
 
 
-param_bcmm.debug_mode= false;
-param_bcmm.rho= 0.5;
-param_bcmm.max_iter= 50;
-param_bcmm.lambda= param.lambda;
-param_bcmm.mu= param.mu;
+param_as.debug_mode= false;
+% param_as.rho= 1;
+param_as.max_iter= 50;
+param_as.lambda= param.lambda;
+param_as.mu= param.mu;
 
 param_as.epsilon= 1e-10;
 param_as.ws=param.ws;
@@ -54,7 +54,8 @@ end
 nm=n*m; % dimension for the vectorized matrix
 y=y(:);
 x=zeros(nm,1);
-keyboard;
+gamma=y;
+
 
 
 max_nb_atoms=param.max_nb_atoms;
@@ -65,6 +66,7 @@ mu=param.mu;
 as.atoms=sparse([],[],[],nm,max_nb_atoms,max_nb_atoms*nm);
 H=sparse([],[],[],max_nb_atoms,max_nb_atoms,max_nb_atoms*max_nb_atoms);
 as.coeffs=[];
+
 
 if param.debug
     maxvals=[];
@@ -98,14 +100,19 @@ while(iter<max_nb_iter),
         switch param.method,
             case 'asqp'
                 % call bcmm, output x, d and the dual variable gamma 
-                [coeffs, x, gamma, niter]=as_tr_l1(coeffs_ws, x_ws, gamm_ws, param_bcmm, param);
+                x_ws=x;
+                gamma_ws=gamma;
+                [coeffs, x, gamma, Jset, npiv]=as_tr_l1(y,as.atoms(:,1:atom_count),coeffs_ws, x_ws, gamma_ws, param_as);
+                
+                fprintf('as finished\n');
+                keyboard;
+                
                 % Hard threshold small negative values
                 smallValues=find(coeffs<0); % for numerical issues
                 coeffs(smallValues)=zeros(length(smallValues),1);
                 %manage H and the set of atoms
-                Jset=smallValues;
+
                 atom_count=sum(Jset);
-                H=H(Jset,Jset);
                 as.atoms(:,1:atom_count)=as.atoms(:,Jset);
                 as.atoms(:,(atom_count+1):end)=0;
                 coeffs=coeffs(Jset,1);
@@ -129,7 +136,7 @@ while(iter<max_nb_iter),
     tau=sum(as.coeffs);
     loss(iter)=0.5*sum(g.^2);
     
-    pen(iter)=lambda*tau;
+    pen(iter)=lambda*tau+mu*sum(abs(x));
     obj(iter)=loss(iter)+pen(iter);
     
     if iter>1,
@@ -146,16 +153,22 @@ while(iter<max_nb_iter),
     
     %% Get new atom (from dual variable gamma)
     
-    [maxval,new_atom]=feval(param.lmo,-g,param);
+%     [maxval,new_atom]=feval(param.lmo,-g,param);
     
-    if maxval>lambda,
-        A=1:atom_count;
+    [u,maxval,v] = svds(reshape(gamma,n,m),1);
+    new_atom=u*v';
+    new_atom=new_atom(:);
+    
+    fprintf('adding atom\n');
+    keyboard;
+    
+    if 1,%descent direction uv' ? maxval>lambda,
         atom_count=atom_count+1;
         max_atom_count_reached=max(max_atom_count_reached,atom_count);
         % Inserting the new atom
         as.atoms(:,atom_count)=new_atom;
         
-        if full(new_atom)'*g>0,
+        if full(new_atom)'*(g+lmabda*sign(x))>0,
             error('new atom wrong');
         end
         new_atom_added=true;
@@ -176,24 +189,24 @@ while(iter<max_nb_iter),
     
     %% Compute duality gap
     
-    c=min(1,lambda./maxval);
-    dg(iter)=0.5*(1-c)^2*sum(g.^2)+lambda*tau+c*g'*x;
-    
-    
-    tt(iter)=toc;
-    
-    if dg(iter) <= param.epsStop,
-        if param.debug,
-            disp('Terminating successfully with small duality gap');
-        end
-        break;
-    end
+%     c=min(1,lambda./maxval);
+%     dg(iter)=0.5*(1-c)^2*sum(g.^2)+lambda*tau+c*g'*x;
+%     
+%     
+%     tt(iter)=toc;
+%     
+%     if dg(iter) <= param.epsStop,
+%         if param.debug,
+%             disp('Terminating successfully with small duality gap');
+%         end
+%         break;
+%     end
     
     %% Debug mode
     
-    if param.debug && iter>1,
-        maxvals=[maxvals maxval];
-    end
+%     if param.debug && iter>1,
+%         maxvals=[maxvals maxval];
+%     end
     
 end
 
