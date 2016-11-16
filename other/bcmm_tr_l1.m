@@ -2,15 +2,15 @@ function [d, x, gamma, r]=bcmm_tr_l1(y,A,d0,x0, gamma0, param)
 
 % solves min |y-Ad|^2+lambda * |x|_1 + mu* 1'*d s.t. Ad=x and d>=0
 
-debug_mode=0;
-max_iter=100;
+debug_mode=1;
+max_iter=50;
 
 x=x0;
 d=d0;
 gamma=gamma0;
 lambda=param.lambda;
 mu=param.mu;
-rho=10*lambda;
+rho=lambda;
 H=(1+rho)*(A'*A);
 b0=A'*y-mu;
 % keyboard;

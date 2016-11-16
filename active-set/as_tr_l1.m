@@ -42,7 +42,7 @@ end
 
 iter=1;
 fprintf('as\n');
-% keyboard;
+keyboard;
 while(iter<=max_iter)
     %% Compute new candidate solution
 %     J=A|(g<0);
@@ -55,11 +55,17 @@ while(iter<=max_iter)
 %     d(A)=Q(A,A)\b(A);
     [d(A), xA, gamma, r]=bcmm_tr_l1(y,atoms(:,A),zeros(sum(A),1),zeros(size(y,1),1), y, param_bcmm);
     %% Progress until active set reduces
-    dotprods= sum(bsxfun(@times,atoms,gamma));
+    
+    K=find(~A);
+    res=0;
+    if ~isempty(K)
+    dotprods= sum(bsxfun(@times,atoms(:,~A),gamma));    
     [res, i_remove]=max(dotprods);
+    end
+        
 %     keyboard;
-    if (res>mu), % Drop step
-        A(i_remove)=false;
+    if ~isempty(K) && (res>mu), % Drop step
+        A(K(i_remove))=false;
         nb_drop_steps=nb_drop_steps+1;
         %fprintf('.');
     else % Full step

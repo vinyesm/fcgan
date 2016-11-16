@@ -29,8 +29,8 @@ addpath('../other');
 n=20;
 p=30;
 sigma=0;
-lambda=1;
-mu=1;
+lambda=0.1;
+mu=0.1;
 
 %% block diagonal covariance with 5 blocks of different sizes
 % block_sz=[30 20 15 10 10 5 5 5]; % when p=100
@@ -71,7 +71,7 @@ param.max_nb_atoms=10; % Right now the code assumes that both are the same
 param.max_nb_iter=10;
 max_iter_fw=500;
 param.epsStop=1e-5;
-param.debug=false;
+param.debug=true;
 param.lmo=@lmo_chain_lgl;
 param.ws=1;
 
