@@ -200,7 +200,7 @@ while(iter<max_nb_iter),
     %     dg(iter)=0.5*(1-c)^2*sum(g.^2)+lambda*tau+c*g'*x;
     %
     %
-    %     tt(iter)=toc;
+        tt(iter)=toc;
     %
     %     if dg(iter) <= param.epsStop,
     %         if param.debug,

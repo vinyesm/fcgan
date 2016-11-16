@@ -67,11 +67,11 @@ S=cov(Y');
 param.method='asqp';
 param.lambda=lambda;
 param.mu=mu;
-param.max_nb_atoms=50; % Right now the code assumes that both are the same
-param.max_nb_iter=50;
+param.max_nb_atoms=10; % Right now the code assumes that both are the same
+param.max_nb_iter=10;
 max_iter_fw=500;
 param.epsStop=1e-5;
-param.debug=true;
+param.debug=false;
 param.lmo=@lmo_chain_lgl;
 param.ws=1;
 
@@ -107,7 +107,7 @@ colorbar;
 pbaspect([(2*p+5)/p 1 1]);
 
 %% algorithm
-[x, as, hist, iter] = cgan_tr_l1(S,param);
+[x, as, hist, iter] = cgan_tr_l1(C,param);
 
 figure(3);
 imagesc([abs(C(1:p,1:p)) ones(p,5) abs(reshape(x,p,p))  ones(p,5) abs(reshape(as.atoms(:,1:length(as.coeffs))*as.coeffs,p,p))]); colormap gray;
@@ -166,25 +166,22 @@ pbaspect([(3*p+2*5)/p 1 1]);
 % tt_bcd=hist_bcd.time_sup;
 % 
 % 
-% %% Duality Gap Figure
-% 
-% xplot{1}=tt_bcd;
-% xplot{2}=tt_as;
-% yplot{1}=dg_bcd;
-% yplot{2}=dg_as;
-% colors = [0 0 0
-%     1 0 0];
-% legendStr={'bcd','cg'};
-% 
-% figure(1)
-% for i=1:2
-% loglog(xplot{i},yplot{i},'-','LineWidth',2,'Color',colors(i,:),'DisplayName',legendStr{i}); 
-% hold on
-% end
-% title('duality gap lgl');
-% legend('show','Location','southwest');
-% grid on
-% hold off
+%% objective
+
+xplot{1}=1:(length(hist.obj));
+yplot{1}=hist.obj;
+colors = [1 0 0];
+legendStr={'tr+l1'};
+
+figure(4)
+for i=1:1
+plot(xplot{i},yplot{i},'-','LineWidth',2,'Color',colors(i,:),'DisplayName',legendStr{i}); 
+hold on
+end
+title('obj tr+l1');
+legend('show','Location','southwest');
+grid on
+hold off
 % 
 % 
 % xplot{1}=hist_bcd.time;

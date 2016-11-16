@@ -101,9 +101,10 @@ if debug_mode,
         error('objective increases in asqp');
     end
     if iter>max_iter,
+        fprintf('max number of iterations in as_tr_l1\n');
         figure(15);
         plot(hist.obj);
-        keyboard;
+%         keyboard;
     end
 end
 
