@@ -99,19 +99,25 @@ while(iter<max_nb_iter),
         end
         switch param.method,
             case 'asqp'
-                % call bcmm, output x, d and the dual variable gamma 
+                % call bcmm, output x, d and the dual variable gamma
                 x_ws=x;
                 gamma_ws=gamma;
                 [coeffs, x, gamma, Jset, npiv]=as_tr_l1(y,as.atoms(:,1:atom_count),coeffs_ws, x_ws, gamma_ws, param_as);
                 
-                fprintf('as finished\n');
-%                 keyboard;
+                x=as.atoms(:,1:atom_count)*coeffs;
+                if param.debug
+                    fprintf('as finished\n');
+                    figure(9)
+                    imagesc(abs(reshape(x,n,m)));
+                    title('current solution');
+                    keyboard
+                end
                 
                 % Hard threshold small negative values
                 smallValues=find(coeffs<0); % for numerical issues
                 coeffs(smallValues)=zeros(length(smallValues),1);
                 %manage H and the set of atoms
-
+                
                 atom_count=sum(Jset);
                 as.atoms(:,1:atom_count)=as.atoms(:,Jset);
                 as.atoms(:,(atom_count+1):end)=0;
@@ -128,7 +134,7 @@ while(iter<max_nb_iter),
     iter=iter+1;
     
     %% Compute gradient
-    g=x-y;    
+    g=x-y;
     
     
     %% Compute objective, loss and penalty
@@ -153,14 +159,14 @@ while(iter<max_nb_iter),
     
     %% Get new atom (from dual variable gamma)
     
-%     [maxval,new_atom]=feval(param.lmo,-g,param);
+    %     [maxval,new_atom]=feval(param.lmo,-g,param);
     
     [u,maxval,v] = svds(reshape(gamma,n,m),1);
     new_atom=u*v';
     new_atom=new_atom(:);
     
     fprintf('adding atom\n');
-%     keyboard;
+    %     keyboard;
     
     if 1,%descent direction uv' ? maxval>lambda,
         atom_count=atom_count+1;
@@ -169,7 +175,7 @@ while(iter<max_nb_iter),
         as.atoms(:,atom_count)=new_atom;
         
         if full(new_atom)'*(g+lambda*sign(x))>mu,
-%             error('new atom wrong');
+            %             error('new atom wrong');
             fprintf('new atom wrong\n');
         end
         new_atom_added=true;
@@ -190,24 +196,24 @@ while(iter<max_nb_iter),
     
     %% Compute duality gap
     
-%     c=min(1,lambda./maxval);
-%     dg(iter)=0.5*(1-c)^2*sum(g.^2)+lambda*tau+c*g'*x;
-%     
-%     
-%     tt(iter)=toc;
-%     
-%     if dg(iter) <= param.epsStop,
-%         if param.debug,
-%             disp('Terminating successfully with small duality gap');
-%         end
-%         break;
-%     end
+    %     c=min(1,lambda./maxval);
+    %     dg(iter)=0.5*(1-c)^2*sum(g.^2)+lambda*tau+c*g'*x;
+    %
+    %
+    %     tt(iter)=toc;
+    %
+    %     if dg(iter) <= param.epsStop,
+    %         if param.debug,
+    %             disp('Terminating successfully with small duality gap');
+    %         end
+    %         break;
+    %     end
     
     %% Debug mode
     
-%     if param.debug && iter>1,
-%         maxvals=[maxvals maxval];
-%     end
+    %     if param.debug && iter>1,
+    %         maxvals=[maxvals maxval];
+    %     end
     
 end
 
@@ -253,9 +259,10 @@ if param.debug
     
     
     figure(11)
-    imagesc(as.atoms(:,1:atom_count));
+    imagesc(abs(as.atoms(:,1:atom_count)));
     xlabel('atom index');
     title('Atoms selected');
+    
     if strcmp(param.method,'asqp')
         total_piv=cumsum(hist.nb_pivot);
         total_piv=total_piv(burn_in:iter);

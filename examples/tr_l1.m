@@ -27,13 +27,14 @@ addpath('../other');
 % lambda: regularization parameter
 % sigma: noise
 n=20;
-p=100;
+p=30;
 sigma=0;
 lambda=1;
 mu=1;
 
 %% block diagonal covariance with 5 blocks of different sizes
-block_sz=[30 20 15 10 10 5 5 5];
+% block_sz=[30 20 15 10 10 5 5 5]; % when p=100
+block_sz=[10 10 5 5];
 nblocs=length(block_sz);
 a=cell(1,nblocs);
 C=zeros(p);
@@ -76,7 +77,7 @@ param.ws=1;
 
 %%
 figure(1);
-imagesc([abs(C(1:100,1:100)) ones(100,5) abs(S(1:100,1:100))]); colormap gray;
+imagesc([abs(C(1:p,1:p)) ones(p,5) abs(S(1:p,1:p))]); colormap gray;
 hTitle=title('   covariance                         empirical covariance');
 % set(gca,'XTick',0:20:135,'YTick',0:10:40);
 h1=xlabel('');
@@ -88,10 +89,10 @@ set(h2,'FontName','AvantGarde','FontSize',14,'FontWeight','normal');
 set(gca,'xtick',[])
 caxis([0, 0.3]);
 colorbar;
-pbaspect([(2*100+5)/100 1 1]);
+pbaspect([(2*p+5)/p 1 1]);
 
 figure(2);
-imagesc([(C(1:100,1:100)~=0) ones(100,5) (S(1:100,1:100)~=0)]); colormap gray;
+imagesc([(C(1:p,1:p)~=0) ones(p,5) (S(1:p,1:p)~=0)]); colormap gray;
 hTitle=title('covariance                         empirical covariance');
 % set(gca,'XTick',0:20:135,'YTick',0:10:40);
 h1=xlabel('');
@@ -103,13 +104,13 @@ set(h2,'FontName','AvantGarde','FontSize',14,'FontWeight','normal');
 set(gca,'xtick',[])
 caxis([0, 0.3]);
 colorbar;
-pbaspect([(2*100+5)/100 1 1]);
+pbaspect([(2*p+5)/p 1 1]);
 
 %% algorithm
-[x, as, hist, iter] = cgan_tr_l1(C,param);
+[x, as, hist, iter] = cgan_tr_l1(S,param);
 
 figure(3);
-imagesc([abs(C(1:100,1:100)) ones(100,5) abs(reshape(x,p,p))  ones(100,5) abs(reshape(as.atoms(:,1:length(as.coeffs))*as.coeffs,p,p))]); colormap gray;
+imagesc([abs(C(1:p,1:p)) ones(p,5) abs(reshape(x,p,p))  ones(p,5) abs(reshape(as.atoms(:,1:length(as.coeffs))*as.coeffs,p,p))]); colormap gray;
 hTitle=title('   covariance          x output            Ad');
 % set(gca,'XTick',0:20:135,'YTick',0:10:40);
 h1=xlabel('');
@@ -121,7 +122,7 @@ set(h2,'FontName','AvantGarde','FontSize',14,'FontWeight','normal');
 set(gca,'xtick',[])
 caxis([0, 0.3]);
 colorbar;
-pbaspect([(3*100+2*5)/100 1 1]);
+pbaspect([(3*p+2*5)/p 1 1]);
 
 
 % %% param

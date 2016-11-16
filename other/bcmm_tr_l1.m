@@ -3,12 +3,12 @@ function [d, x, gamma, r]=bcmm_tr_l1(y,A,d0,x0, gamma0, param)
 % solves min |y-Ad|^2+lambda * |x|_1 + mu* 1'*d s.t. Ad=x and d>=0
 
 debug_mode=1;
-max_iter=1000;
+max_iter=20;
 
 x=x0;
 d=d0;
 gamma=gamma0;
-rho=10;
+rho=1;
 lambda=param.lambda;
 mu=param.mu;
 H=(1+rho)*(A'*A);
@@ -18,7 +18,7 @@ b0=A'*y-mu;
 param_as.debug_mode= false;
 param_as.epsilon= 1e-10;
 param_as.ws=1;
-param_as.max_iter= 1000;
+param_as.max_iter= 100;
 
 if debug_mode
     obj=zeros(1,max_iter);
@@ -31,7 +31,7 @@ while r<max_iter
     
     %update on gamma,x
     r=r+1;
-    alpha=1/r;    
+    alpha=rho/sqrt(r);    
     gamma=gamma+alpha*(x-A*d);
     x=soft_threshold(A*d-gamma/rho,lambda/rho);
     
@@ -43,7 +43,7 @@ while r<max_iter
         
     %update on gamma,d
     r=r+1;
-    alpha=1/r;    
+    alpha=rho/sqrt(r);    
     gamma=gamma+alpha*(x-A*d);
     b=b0+A'*(rho*x+gamma);
     [d,Jset,npiv]=asqp(H+1e-10*eye(size(H,1)),b,d,param_as,0);
