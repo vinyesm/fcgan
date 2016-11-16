@@ -42,7 +42,7 @@ end
 
 iter=1;
 fprintf('as\n');
-keyboard;
+% keyboard;
 while(iter<=max_iter)
     %% Compute new candidate solution
 %     J=A|(g<0);
@@ -57,7 +57,7 @@ while(iter<=max_iter)
     %% Progress until active set reduces
     dotprods= sum(bsxfun(@times,atoms,gamma));
     [res, i_remove]=max(dotprods);
-    keyboard;
+%     keyboard;
     if (res>mu), % Drop step
         A(i_remove)=false;
         nb_drop_steps=nb_drop_steps+1;

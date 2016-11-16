@@ -102,11 +102,10 @@ while(iter<max_nb_iter),
                 % call bcmm, output x, d and the dual variable gamma 
                 x_ws=x;
                 gamma_ws=gamma;
-                keyboard;
                 [coeffs, x, gamma, Jset, npiv]=as_tr_l1(y,as.atoms(:,1:atom_count),coeffs_ws, x_ws, gamma_ws, param_as);
                 
                 fprintf('as finished\n');
-                keyboard;
+%                 keyboard;
                 
                 % Hard threshold small negative values
                 smallValues=find(coeffs<0); % for numerical issues
@@ -161,7 +160,7 @@ while(iter<max_nb_iter),
     new_atom=new_atom(:);
     
     fprintf('adding atom\n');
-    keyboard;
+%     keyboard;
     
     if 1,%descent direction uv' ? maxval>lambda,
         atom_count=atom_count+1;
@@ -169,7 +168,7 @@ while(iter<max_nb_iter),
         % Inserting the new atom
         as.atoms(:,atom_count)=new_atom;
         
-        if full(new_atom)'*(g+lambda*sign(x))>0,
+        if full(new_atom)'*(g+lambda*sign(x))>mu,
 %             error('new atom wrong');
             fprintf('new atom wrong\n');
         end

@@ -35,6 +35,7 @@ function [c,A,nbpivot]=asqp(Q,b,c0,param,new_atom_added)
 max_iter=param.max_iter;
 epsilon=param.epsilon;
 debug_mode=param.debug_mode;
+debug_mode=1;
 
 tol=1e-14;
 t=size(c0,1);
@@ -150,6 +151,7 @@ if debug_mode,
         plot(hist.obj);
         keyboard;
     end
+%     keyboard;
 end
 
 

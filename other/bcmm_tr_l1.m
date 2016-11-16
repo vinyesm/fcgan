@@ -13,12 +13,12 @@ lambda=param.lambda;
 mu=param.mu;
 H=(1+rho)*(A'*A);
 b0=A'*y-mu;
-keyboard;
+% keyboard;
 
 param_as.debug_mode= false;
 param_as.epsilon= 1e-10;
 param_as.ws=1;
-param_as.max_iter= 100;
+param_as.max_iter= 1000;
 
 if debug_mode
     obj=zeros(1,max_iter);
