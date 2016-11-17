@@ -1,4 +1,4 @@
-function [c,x,gamma,A,nbpivot]=as_tr_l1(y,atoms,c0,x0,gamma0,param)
+function [c,x_ws,gamma_ws,A,nbpivot]=as_tr_l1(y,atoms,c0,x0,gamma0,param)
 
 % [x,d,gamma] solve subproblem with bcmm
 % s2 = gamma
@@ -40,9 +40,14 @@ if debug_mode,
     obj_old=0.5*norm(y-atoms*c,'fro')^2+lambda*sum(abs(x))+mu*sum(c);
 end
 
+gamma_ws=y;
+x_ws=zeros(size(y,1),1);
+d_ws=zeros(length(c0),1);
+d=d_ws;
+
 iter=1;
 fprintf('as\n');
-keyboard;
+
 while(iter<=max_iter)
     %% Compute new candidate solution
 %     J=A|(g<0);
@@ -51,15 +56,27 @@ while(iter<=max_iter)
 %     else
 %         hist.norm_g(iter)=norm(g(A));
 %     end
-    d=zeros(t,1);
-%     d(A)=Q(A,A)\b(A);
-    [d(A), xA, gamma, r]=bcmm_tr_l1(y,atoms(:,A),zeros(sum(A),1),zeros(size(y,1),1), y, param_bcmm);
+%     d=zeros(t,1);
+    d_ws=d;
+    [d(A), x_ws, gamma_ws, r]=bcmm_tr_l1(y,atoms(:,A),d_ws(A),x_ws, gamma_ws, param_bcmm);
     %% Progress until active set reduces
-    
+    keyboard;
     K=find(~A);
     res=0;
+    
+    %test
+    A0=A&(d<1e-12);
+    Aind=find(A0);
     if ~isempty(K)
-    dotprods= sum(bsxfun(@times,atoms(:,~A),gamma));    
+    dotprods= sum(bsxfun(@times,atoms(:,A0),gamma_ws)); 
+    [res, ind]=max(dotprods);
+    if res>mu
+        error('problem with conditions');
+    end
+    end
+    
+    if ~isempty(K)
+    dotprods= sum(bsxfun(@times,atoms(:,~A),gamma_ws));    
     [res, i_remove]=max(dotprods);
     end
         
@@ -70,7 +87,7 @@ while(iter<=max_iter)
         %fprintf('.');
     else % Full step
         c=d;
-        x=xA;
+        x=x_ws;
         nb_full_steps=nb_full_steps+1;
         break;
         %fprintf('+')

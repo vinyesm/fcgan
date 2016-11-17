@@ -10,8 +10,8 @@ d=d0;
 gamma=gamma0;
 lambda=param.lambda;
 mu=param.mu;
-rho=lambda;
-H=(1+rho)*(A'*A);
+rho=0.1*lambda;
+H=(A'*A);
 b0=A'*y-mu;
 % keyboard;
 
@@ -31,9 +31,10 @@ while r<max_iter
     
     %update on gamma,x
     r=r+1;
-    alpha=rho/sqrt(r);    
+    alpha=rho/sqrt(100+r);    
     gamma=gamma+alpha*(x-A*d);
     x=soft_threshold(A*d-gamma/rho,lambda/rho);
+%     keyboard;
     
     if debug_mode
         obj(r)=0.5*norm(y-A*d,'fro')^2+rho/2*norm(x-A*d,'fro')^2+lambda*sum(abs(x))+mu*sum(d);
@@ -43,9 +44,9 @@ while r<max_iter
         
     %update on gamma,d
     r=r+1;
-    alpha=rho/sqrt(r);    
+    alpha=rho/sqrt(100+r);    
     gamma=gamma+alpha*(x-A*d);
-    b=b0+A'*(rho*x+gamma);
+    b=A'*(rho*x+gamma+y)-mu;
     [d,Jset,npiv]=asqp(H+1e-10*eye(size(H,1)),b,d,param_as,0);
     
     if debug_mode

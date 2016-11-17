@@ -104,14 +104,16 @@ while(iter<max_nb_iter),
                 gamma_ws=gamma;
                 [coeffs, x, gamma, Jset, npiv]=as_tr_l1(y,as.atoms(:,1:atom_count),coeffs_ws, x_ws, gamma_ws, param_as);
                 
-                x=as.atoms(:,1:atom_count)*coeffs;
+                
                 if param.debug
                     fprintf('as finished\n');
                     figure(9)
-                    imagesc(abs(reshape(x,n,m)));
+                    imagesc([abs(reshape(x,n,m)) abs(reshape(as.atoms(:,1:atom_count)*coeffs,n,m))]);
                     title('current solution');
+                    pbaspect([(2*n)/n 1 1]);
                     keyboard
                 end
+                x=as.atoms(:,1:atom_count)*coeffs;
                 
                 % Hard threshold small negative values
                 smallValues=find(coeffs<0); % for numerical issues
@@ -174,9 +176,9 @@ while(iter<max_nb_iter),
         % Inserting the new atom
         as.atoms(:,atom_count)=new_atom;
         
-        if full(new_atom)'*(g+lambda*sign(x))>mu,
+        if full(new_atom)'*(x-y+lambda*sign(x))+lambda*max(abs(new_atom(x==0)))+mu>0,
             %             error('new atom wrong');
-            fprintf('new atom wrong\n');
+            fprintf('new atom wrong, directional direvative is positive\n');
         end
         new_atom_added=true;
     else
