@@ -8,7 +8,7 @@ function [c,x_ws,gamma_ws,A,nbpivot]=as_tr_l1(y,atoms,c0,x0,gamma0,param)
 
 debug_mode=1;
 
-max_iter=param.max_iter;
+max_iter=1;
 % epsilon=param.epsilon;
 lambda=param.lambda;
 mu=param.mu;

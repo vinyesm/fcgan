@@ -10,7 +10,7 @@ d=d0;
 gamma=gamma0;
 lambda=param.lambda;
 mu=param.mu;
-rho=lambda;
+rho=0.1*lambda;
 H=(A'*A);
 b0=A'*y-mu;
 % keyboard;
@@ -43,6 +43,8 @@ while r<max_iter
         lag(r)=0.5*norm(y-A*d,'fro')^2+rho/2*norm(x-A*d,'fro')^2+lambda*sum(abs(x))+mu*sum(d) + dot(gamma,x-A*d);
         eq(r)=norm(x-A*d,'fro')^2;
         dg(r)=-dot(gamma,x-A*d);
+%         pres(r)=
+%         dres(r)=
     end
         
     %update on gamma,d
