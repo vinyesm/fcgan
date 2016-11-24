@@ -29,7 +29,7 @@ addpath('../other');
 n=20;
 p=30;
 sigma=0;
-lambda=0.1;
+lambda=0.5;
 mu=0.1;
 
 %% block diagonal covariance with 5 blocks of different sizes

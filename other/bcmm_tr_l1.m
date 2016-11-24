@@ -1,9 +1,9 @@
-function [d, x, gamma, r]=bcmm_tr_l1(y,A,d0,x0, gamma0, param)
+function [d, x, gamma,Jset, r]=bcmm_tr_l1(y,A,d0,x0, gamma0, param)
 
 % solves min |y-Ad|^2+lambda * |x|_1 + mu* 1'*d s.t. Ad=x and d>=0
 
 debug_mode=1;
-max_iter=100;
+max_iter=50;
 
 x=x0;
 d=d0;
@@ -61,6 +61,9 @@ while r<max_iter
         dg(r)=-dot(gamma,x-A*d);
     end
 end
+
+x=A*d;
+Jset=(abs(d)>1e-15);
 
 if debug_mode
     figure(10);clf;

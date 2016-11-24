@@ -102,8 +102,8 @@ while(iter<max_nb_iter),
                 % call bcmm, output x, d and the dual variable gamma
                 x_ws=x;
                 gamma_ws=gamma;
-                [coeffs, x, gamma, Jset, npiv]=as_tr_l1(y,as.atoms(:,1:atom_count),coeffs_ws, x_ws, gamma_ws, param_as);
-                
+                %[coeffs, x, gamma, Jset, npiv]=as_tr_l1(y,as.atoms(:,1:atom_count),coeffs_ws, x_ws, gamma_ws, param_as);
+                [coeffs, x, gamma, Jset, npiv]=bcmm_tr_l1(y,as.atoms(:,1:atom_count),coeffs_ws, x_ws, gamma_ws, param_as);
                 
                 if param.debug
                     fprintf('as finished\n');
@@ -113,17 +113,19 @@ while(iter<max_nb_iter),
                     pbaspect([(2*n)/n 1 1]);
                     keyboard
                 end
-                x=as.atoms(:,1:atom_count)*coeffs;
+                %x=as.atoms(:,1:atom_count)*coeffs;
                 
                 % Hard threshold small negative values
                 smallValues=find(coeffs<0); % for numerical issues
                 coeffs(smallValues)=zeros(length(smallValues),1);
                 %manage H and the set of atoms
                 
+                if sum(Jset)>0
                 atom_count=sum(Jset);
                 as.atoms(:,1:atom_count)=as.atoms(:,Jset);
                 as.atoms(:,(atom_count+1):end)=0;
                 coeffs=coeffs(Jset,1);
+                end
             otherwise
                 error('Unknown method');
         end
@@ -163,22 +165,30 @@ while(iter<max_nb_iter),
     
     %     [maxval,new_atom]=feval(param.lmo,-g,param);
     
-    [u,maxval,v] = svds(reshape(gamma,n,m),1);
+    s=-g;
+    s2=gamma/mu;
+    s1=(s-gamma)/lambda;
+    
+    [u,maxval,v] = svds(reshape(s2,n,m),1);
     new_atom=u*v';
     new_atom=new_atom(:);
     
-    fprintf('adding atom\n');
+    
+    
+    
     %     keyboard;
     
     if 1,%descent direction uv' ? maxval>lambda,
+        fprintf('adding atom\n');
         atom_count=atom_count+1;
         max_atom_count_reached=max(max_atom_count_reached,atom_count);
         % Inserting the new atom
         as.atoms(:,atom_count)=new_atom;
         
-        if full(new_atom)'*(x-y+lambda*sign(x))+lambda*max(abs(new_atom(x==0)))+mu>0,
+        %if full(new_atom)'*(x-y+lambda*sign(x))+lambda*max(abs(new_atom(x==0)))+mu>0,
+        if maxval>mu+1e-6 || max(abs(s1))>1+1e-6
             %             error('new atom wrong');
-            fprintf('new atom wrong, directional direvative is positive\n');
+            fprintf('new atom wrong\n');
         end
         new_atom_added=true;
     else
