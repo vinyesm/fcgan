@@ -5,6 +5,7 @@ function [ Z, ActiveSet, hist] = solve_ps_spca_asqp( Z,ActiveSet,param,inputData
 param_as.max_iter=1e3;
 param_as.epsilon=1e-14;
 param_as.debug_mode=false;
+param_as.ws=true;
 
 obj = zeros(1,param.niterPS);
 pen =  zeros(1,param.niterPS);
