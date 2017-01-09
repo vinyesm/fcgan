@@ -83,11 +83,13 @@ param.max_nb_atoms=param.max_nb_main_loop*param.niterPS;
 param.cardfun=inf*ones(1,p);
 param.cardfun(5)=1;
 %%
-
+inputData.X1=S^.5;
+inputData.X2=inputData.X1;
+inputData.Y=S;
 param.lambda=lambda;
 %% as quadprog
 param.opt='asqp';
-[Z_as,D_as, ActiveSet_as, hist_as, param_as, flaga_as, it_as] = cgan_lgm(S,inputData,param);
+[Z_as,D_as, ActiveSet_as, hist_as, param_as, flaga_as, it_as] = cgan_lgm(inputData,param);
 dg_as=hist_as.dg_sup;
 tt_as=hist_as.time_sup;
 fprintf('lambda=%f\n',lambda);

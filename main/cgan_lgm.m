@@ -1,4 +1,4 @@
-function [Z D ActiveSet hist param flag output] = cgan_lgm(S,param,startingZ,ActiveSet)
+function [Z D ActiveSet hist param flag output] = cgan_lgm(inputData,param,startingZ,startingD,ActiveSet)
 
 % Active set algorithm to minimize f(Z) + lambda Omega_kq(Z), where f is a
 % convex function with Lipschitz gradient and Omega_kq is the kq-trace norm
@@ -72,9 +72,6 @@ function [Z D ActiveSet hist param flag output] = cgan_lgm(S,param,startingZ,Act
 flag_store_in_asqp=0;
 
 %%
-inputData.X1=S^.5;
-inputData.X2=inputData.X1;
-inputData.Y=S;
 if nargin < 3
     Z = zeros(size(inputData.X1,2), size(inputData.X2,1));
     D = eye(size(inputData.X1,2));
@@ -167,15 +164,16 @@ while c
     
     %% get a new descent direction using truncated power iteration
     
-    
+    YStart=inputData.Y;
+    inputData.Y= YStart - inputData.X1*diag(D)*inputData.X2;
     H = gradient(Z,inputData,param);
-
+    inputData.Y=YStart;
     
     if param.verbose==1
         fprintf('%d/%d   \n',i,max_nb_main_loop);
     end
     
-    [u, kBest] = lmo_spca(-H,param);
+    [u, kBest] = lmo_spsd_TPower(-H,param);
     param.k=kBest;
     currI = find(u);
     

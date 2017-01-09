@@ -19,6 +19,8 @@ p=size(Z,1);
 cardVal=[];
 lambdas=[];
 
+YStart=inputData.Y;
+inputData.Y= YStart - inputData.X1*diag(D)*inputData.X2;
 if ActiveSet.atom_count>0
     if param.diag==1
         lambdas=param.lambda*[zeros(p,1);ones(ActiveSet.atom_count-p,1)];
@@ -51,6 +53,7 @@ else
     H=[];
     f=[];
 end
+inputData.Y=YStart;
 
 if param.debug
     alphaSparsity=[];
@@ -105,16 +108,20 @@ while cont
         
         %% Compute objective, loss, penalty and duality gap
         if param.sloppy==0 || (param.sloppy~=0 && mod(count,10)==1)
-            [loss(i),pen(i),obj(i),dg(i),time(i)]=get_val_spca_asqp(ActiveSet,inputData,param,cardVal);
+            [loss(i),pen(i),obj(i),dg(i),time(i)]=get_val_lgm_asqp(Z,D,ActiveSet,inputData,param,cardVal);
             nb_pivot(i)=npiv;
             active_var(i)= sum(ActiveSet.alpha>0);
             cont = (dg(i)>param.PSdualityEpsilon) && count< param.niterPS;
             i=i+1;
         end
+
+        %% update D
     end
     
     %% get new atom
     if cont
+        YStart=inputData.Y;
+        inputData.Y= YStart - inputData.X1*diag(D)*inputData.X2;
         [new_i, new_val, maxval]=get_new_atom_spca(Z,ActiveSet,param,inputData);
         ActiveSet.atom_count = ActiveSet.atom_count +1;
         ActiveSet.max_atom_count_reached=max(ActiveSet.max_atom_count_reached,ActiveSet.atom_count);
@@ -155,6 +162,7 @@ while cont
         if maxval<0
             error('\nNegative directional derivative d=%f\n',maxval);
         end
+        inputData.Y= YStart;
     end
     
     count=count+1;
