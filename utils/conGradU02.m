@@ -3,11 +3,12 @@ function x = conGradU02(A,nit,k)
 x = randn(size(A,1),1);
 x = projectL0(x,k);
 x = sparse(x);
+debug=0;
 % vold=0;
 % vnew=0;
 % x0 = zeros(size(A,1),1);
 % if k==1
-%     [val,idx]=max(diag(A));        
+%     [val,idx]=max(diag(A));
 %     x0(idx) = 1;
 % else
 %     [val,idx]=sort(diag(A), 'descend');
@@ -16,30 +17,34 @@ x = sparse(x);
 % end
 % x=x0;
 
-    if A ==0
+if A ==0
+    x = projectL0(x,k);
+else
+    
+    for i=1:nit
+        %             if test==1
+        vold=x'*A*x;
+        %             end
+        x = A*x;
         x = projectL0(x,k);
-    else
-
-        for i=1:nit  
-%             if test==1
-                vold=x'*A*x;
-%             end
-                x = A*x;
-                x = projectL0(x,k);
-                x = x/norm(x);
-%             if test==1
-                vnew=x'*A*x;
-                err=abs(vnew-vold)/vold;
-                if (err)<1e-8
-%                         keyboard;
-%                         fprintf('        congrad converged in %d iteration\n', i);
-                    break;
-%                 end
-                end
-        end
-        if i>=nit
-%             keyboard;
-%             fprintf('        congrad NOT converged at 0.000001. Only %f\n', err);
+        x = x/norm(x);
+        %             if test==1
+        vnew=x'*A*x;
+        err=abs(vnew-vold)/vold;
+        if (err)<1e-8
+            if debug
+                %                         keyboard;
+                fprintf('        congrad converged in %d iteration\n', i);
+            end
+            break;
+            %                 end
         end
     end
+    if i>=nit
+        %             keyboard;
+        if debug
+            fprintf('        congrad NOT converged at 0.000001. Only %f\n', err);
+        end
+    end
+end
 end

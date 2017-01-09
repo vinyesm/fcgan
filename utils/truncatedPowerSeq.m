@@ -1,6 +1,6 @@
 function [u v] = truncatedPowerSeq(A,param)
 
-debug=1;
+debug=0;
 
 v = randn(size(A,2),1);v = v/norm(v);
 if param.PSD
@@ -29,12 +29,17 @@ else
         pnew=u'*A*v;
         err=abs((pold-pnew)/pold);
         if err<1e-8
+            if debug
+             fprintf(['nb iterations in truncatedPowerSeq ' num2str(i) '\n' ]);
+            end
             break;
         end
         pold=pnew;
     end
     if debug==1 && i==param.powerIter
+        if debug
         fprintf(['In truncatedPowerSeq exit error=' num2str(err) '\n']);
+        end
     end
 end
 
