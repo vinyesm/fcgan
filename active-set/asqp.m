@@ -151,7 +151,6 @@ if debug_mode,
         plot(hist.obj);
         keyboard;
     end
-%     keyboard;
 end
 
 

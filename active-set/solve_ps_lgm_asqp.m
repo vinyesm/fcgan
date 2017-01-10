@@ -54,7 +54,6 @@ else
     f=[];
 end
 inputData.Y=YStart;
-keyboard;
 
 if param.debug
     alphaSparsity=[];
@@ -113,7 +112,10 @@ while cont
             [loss(i),pen(i),obj(i),dg(i),time(i)]=get_val_lgm_asqp(Z,D,ActiveSet,inputData,param,cardVal);
             nb_pivot(i)=npiv;
             active_var(i)= sum(ActiveSet.alpha>0);
-            cont = (dg(i)>param.PSdualityEpsilon) && count< param.niterPS;
+%             cont = (dg(i)>param.PSdualityEpsilon) && count< param.niterPS;
+            if i>1
+                cont = (sum((obj(i)-obj(i-1)).^2)>1e-16) && count< param.niterPS;
+            end
             i=i+1;
         end
         
@@ -124,7 +126,10 @@ while cont
             [loss(i),pen(i),obj(i),dg(i),time(i)]=get_val_lgm_asqp(Z,D,ActiveSet,inputData,param,cardVal);
             nb_pivot(i)=npiv;
             active_var(i)= sum(ActiveSet.alpha>0);
-            cont = (dg(i)>param.PSdualityEpsilon) && count< param.niterPS;
+%             cont = (dg(i)>param.PSdualityEpsilon) && count< param.niterPS;
+            if i>1
+                cont = (sum((obj(i)-obj(i-1)).^2)>1e-16) && count< param.niterPS;
+            end
             i=i+1;
         end
         
@@ -142,6 +147,7 @@ while cont
         ActiveSet.atoms(:,ActiveSet.atom_count)=anew;
         
         unew=real(inputData.X1)*anew;
+        
         if isempty(U)
             vnew=[];
         else
@@ -149,6 +155,8 @@ while cont
             vnew=vnew.*vnew;
         end
         U=[U unew];
+        U
+        keyboard; 
 %         G2=U'*U;        
 %         Gold=G;
 %         G=zeros(ActiveSet.atom_count);
@@ -201,10 +209,10 @@ end
 if param.debug
     figure(10);clf;
     subplot(1,4,1);
-    plot(obj);
+    plot(hist.obj);
     title('objective');
     subplot(1,4,2);
-    semilogy(dg);
+    semilogy(hist.dg);
     title('duality gap');
     subplot(1,4,3)
     plot(alphaSparsity);
@@ -215,7 +223,7 @@ if param.debug
     keyboard;
 end
 
-if 1
+if 0
     figure(10);clf;
     subplot(1,4,1);
     plot(obj);

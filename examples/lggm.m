@@ -22,7 +22,7 @@ addpath('../other');
 n=300;
 p=15;
 sigma=0;
-lambda=.1;
+lambda=.5;
 
 %% Covariance and design matrix
 rho1 = 0.7;
@@ -83,7 +83,7 @@ param.max_nb_atoms=param.max_nb_main_loop*param.niterPS;
 param.cardfun=inf*ones(1,p);
 param.cardfun(5)=1;
 %%
-S=C;
+%S=C;
 inputData.X1=S^.5;
 inputData.X2=inputData.X1;
 inputData.Y=eye(p);
@@ -141,7 +141,7 @@ hold off
 %%
 %%
 figure(5);
-imagesc([abs(C) 1*ones(p,5) abs(inv(S)) 1*ones(p,5) abs(inv(Z_as+D_as))]); colormap gray;
+imagesc([abs(C) 1*ones(p,5) abs(inv(S)) 1*ones(p,5) abs(inv(Z_as+diag(D_as)))]); colormap gray;
 hTitle=title('   inverse covariance                        inverse empirical covariance      estimated inverse');
 % set(gca,'XTick',0:20:135,'YTick',0:10:40);
 h1=xlabel('');
