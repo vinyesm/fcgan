@@ -47,7 +47,7 @@ Y = mvnrnd(mu, C+sigma^2*eye(p), n)';
 S=cov(Y');
 
 %%
-figure(3);
+figure(1);
 imagesc([abs(C) 1*ones(p,5) abs(inv(S))]); colormap gray;
 hTitle=title('   inverse covariance                        inverse empirical covariance');
 % set(gca,'XTick',0:20:135,'YTick',0:10:40);
@@ -83,9 +83,10 @@ param.max_nb_atoms=param.max_nb_main_loop*param.niterPS;
 param.cardfun=inf*ones(1,p);
 param.cardfun(5)=1;
 %%
+S=C;
 inputData.X1=S^.5;
 inputData.X2=inputData.X1;
-inputData.Y=S;
+inputData.Y=eye(p);
 param.lambda=lambda;
 %% as quadprog
 param.opt='asqp';
@@ -103,7 +104,7 @@ yplot{1}=dg_as;
 colors = [1 0 0];
 legendStr={'cg'};
 
-figure(1)
+figure(2);clf
 for i=1
 loglog(xplot{i},yplot{i},'-','LineWidth',2,'Color',colors(i,:),'DisplayName',legendStr{i}); 
 hold on
@@ -120,7 +121,7 @@ yplot{1}=hist_as.dg;
 colors = [    1 0 0];
 legendStr={'cg'};
 
-figure(2)
+figure(3);clf
 for i=1
 loglog(xplot{i},yplot{i},'-','LineWidth',2,'Color',colors(i,:),'DisplayName',legendStr{i}); 
 hold on
@@ -129,4 +130,28 @@ title('duality gap lgl');
 legend('show','Location','southwest');
 grid on
 hold off
+
+figure(4);clf
+loglog(tt_as,dg_as,'-','LineWidth',2,'Color',[0 0 0],'DisplayName','dg sup');hold on;
+loglog(hist_as.time,hist_as.dg,'-','LineWidth',2,'Color',[1 0 0],'DisplayName','dg sup');hold on;
+legend('show','Location','southwest');
+grid on
+hold off
+
+%%
+%%
+figure(5);
+imagesc([abs(C) 1*ones(p,5) abs(inv(S)) 1*ones(p,5) abs(inv(Z_as+D_as))]); colormap gray;
+hTitle=title('   inverse covariance                        inverse empirical covariance      estimated inverse');
+% set(gca,'XTick',0:20:135,'YTick',0:10:40);
+h1=xlabel('');
+h2=ylabel('');
+set(h1,'Visible','off');
+set(gca,'FontName','AvantGarde','FontWeight','normal','FontSize',12);
+set(hTitle,'FontName','AvantGarde','FontSize',14,'FontWeight','bold');
+set(h2,'FontName','AvantGarde','FontSize',14,'FontWeight','normal');
+set(gca,'xtick',[])
+caxis([0, 0.3]);
+colorbar;
+pbaspect([(3*p+10)/p 1 1]);
 

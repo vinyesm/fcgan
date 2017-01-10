@@ -74,7 +74,7 @@ flag_store_in_asqp=0;
 %%
 if nargin < 3
     Z = zeros(size(inputData.X1,2), size(inputData.X2,1));
-    D = eye(size(inputData.X1,2));
+    D = zeros(size(inputData.X1,2),1);
     ActiveSet = {};
     ActiveSet.I = {};
     ActiveSet.U = {};
@@ -108,7 +108,7 @@ hist.varIJ=[];
 hist.nzalphas=[];
 hist.normalpha=[];
 p=size(Z,1);
-D=zeros(p,1);
+%D=zeros(p,1);
 output.time=0;
 
 tic
@@ -117,12 +117,15 @@ max_nb_atoms = param.max_nb_atoms;
 max_nb_main_loop = param.max_nb_main_loop;
 hist.time=toc;
 
+%update D
+covariance=inputData.X1^2;
+D=diag(covariance^2-covariance*Z*covariance)\(covariance.^2);
+
 
 
 %%
 c = 1;
 i = 0;
-
 
 
 while c
@@ -139,7 +142,7 @@ while c
             fprintf('    solving PS..\n ')
         end
         if strcmp('asqp',param.opt)
-            [Z, D, ActiveSet, hist_ps] = solve_ps_spca_asqp(Z, D, ActiveSet,param,inputData);
+            [Z, D, ActiveSet, hist_ps] = solve_ps_lgm_asqp(Z, D, ActiveSet,param,inputData);
             if ~isempty(ActiveSet.alpha) && param.debug==1
                 hist.nzalphas=[hist.nzalphas full(sum(ActiveSet.alpha>0))];
                 hist.normalpha=[hist.normalpha full(sum(ActiveSet.alpha))];
@@ -164,10 +167,12 @@ while c
     
     %% get a new descent direction using truncated power iteration
     
-    YStart=inputData.Y;
-    inputData.Y= YStart - inputData.X1*diag(D)*inputData.X2;
-    H = gradient(Z,inputData,param);
-    inputData.Y=YStart;
+%     keyboard;
+%     YStart=inputData.Y;
+%     inputData.Y= YStart - inputData.X1*diag(D)*inputData.X2;
+%     H = gradient(Z,inputData,param);
+%     inputData.Y=YStart;
+    H = gradient(Z+diag(D),inputData,param);
     
     if param.verbose==1
         fprintf('%d/%d   \n',i,max_nb_main_loop);
@@ -209,7 +214,7 @@ while c
         c=0;
     elseif varIJ > param.lambda*(1+param.epsStop / kBest)* param.cardfun(kBest)
         ActiveSet.I = [ActiveSet.I, currI];
-        ActiveSet.U = [ActiveSet.U, u(currI)];
+        ActiveSet.U = [ActiveSet.U, full(u(currI))];
         ActiveSet.Sigma = [ActiveSet.Sigma, varIJ];
         ActiveSet.Z = [ActiveSet.Z, zeros(param.k,param.k)];
         ActiveSet.tracenorm = [ ActiveSet.tracenorm , 0];

@@ -54,6 +54,7 @@ else
     f=[];
 end
 inputData.Y=YStart;
+keyboard;
 
 if param.debug
     alphaSparsity=[];
@@ -86,6 +87,7 @@ while cont
         end
         
         % active-set
+        %keyboard;
         [alph,Jset,npiv]=asqp(H+1e-14*eye(ActiveSet.atom_count),-f,alpha0,param_as,1);
         
         new_atom_count=sum(Jset);
@@ -114,8 +116,18 @@ while cont
             cont = (dg(i)>param.PSdualityEpsilon) && count< param.niterPS;
             i=i+1;
         end
-
+        
         %% update D
+        covariance=inputData.X1^2;
+        D=diag(covariance^2-covariance*Z*covariance)\(covariance.^2);
+        if param.sloppy==0 || (param.sloppy~=0 && mod(count,10)==1)
+            [loss(i),pen(i),obj(i),dg(i),time(i)]=get_val_lgm_asqp(Z,D,ActiveSet,inputData,param,cardVal);
+            nb_pivot(i)=npiv;
+            active_var(i)= sum(ActiveSet.alpha>0);
+            cont = (dg(i)>param.PSdualityEpsilon) && count< param.niterPS;
+            i=i+1;
+        end
+        
     end
     
     %% get new atom
@@ -200,6 +212,22 @@ if param.debug
     subplot(1,4,4)
     plot(diffalphas);
     title('diff alphas');
+    keyboard;
+end
+
+if 1
+    figure(10);clf;
+    subplot(1,4,1);
+    plot(obj);
+    title('objective');
+    subplot(1,4,2);
+    semilogy(dg);
+    title('duality gap');
+    figure(11);clf
+    subplot(1,2,1)
+    imagesc(abs(Z+diag(D))); colormap gray;
+    subplot(1,2,2)
+    imagesc(abs(Z)); colormap gray;
     keyboard;
 end
 
