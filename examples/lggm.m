@@ -19,10 +19,10 @@ addpath('../utils');
 addpath('../other');
 
 %% Experimental Setting
-n=300;
+n=5000;
 p=15;
 sigma=0;
-lambda=.5;
+lambda=0.1;
 
 %% Covariance and design matrix
 rho1 = 0.7;
@@ -68,7 +68,7 @@ keyboard;
 param.f=4;
 param.diag=0;
 param.PSD=true;
-param.max_nb_main_loop=20;
+param.max_nb_main_loop=300;
 param.powerIter=100;
 param.stPtPowerIter=1000;
 param.niterPS=10000;%5000

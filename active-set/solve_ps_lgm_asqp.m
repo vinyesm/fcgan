@@ -114,7 +114,7 @@ while cont
             active_var(i)= sum(ActiveSet.alpha>0);
 %             cont = (dg(i)>param.PSdualityEpsilon) && count< param.niterPS;
             if i>1
-                cont = (sum((obj(i)-obj(i-1)).^2)>1e-16) && count< param.niterPS;
+                cont = (sum((obj(i)-obj(i-1)).^2)>1e-10) && count< param.niterPS;
             end
             i=i+1;
         end
@@ -128,7 +128,7 @@ while cont
             active_var(i)= sum(ActiveSet.alpha>0);
 %             cont = (dg(i)>param.PSdualityEpsilon) && count< param.niterPS;
             if i>1
-                cont = (sum((obj(i)-obj(i-1)).^2)>1e-16) && count< param.niterPS;
+                cont = (sum((obj(i)-obj(i-1)).^2)>1e-10) && count< param.niterPS;
             end
             i=i+1;
         end
@@ -155,8 +155,7 @@ while cont
             vnew=vnew.*vnew;
         end
         U=[U unew];
-        U
-        keyboard; 
+        
 %         G2=U'*U;        
 %         Gold=G;
 %         G=zeros(ActiveSet.atom_count);
@@ -182,6 +181,7 @@ while cont
         if maxval<0
             error('\nNegative directional derivative d=%f\n',maxval);
         end
+        
         inputData.Y= YStart;
     end
     

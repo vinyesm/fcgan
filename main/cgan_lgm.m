@@ -127,6 +127,7 @@ D=diag(covariance^2-covariance*Z*covariance)\(covariance.^2);
 c = 1;
 i = 0;
 
+keyboard;
 
 while c
     i = i+1;
@@ -211,7 +212,7 @@ while c
     
     if takenI
         fprintf('This support has already been added. Stopping\n\n');
-        c=0;
+        %c=0;
     elseif varIJ > param.lambda*(1+param.epsStop / kBest)* param.cardfun(kBest)
         ActiveSet.I = [ActiveSet.I, currI];
         ActiveSet.U = [ActiveSet.U, full(u(currI))];
