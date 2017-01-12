@@ -17,12 +17,15 @@ addpath('../active-set');
 addpath('../atom-selection');
 addpath('../utils');
 addpath('../other');
+addpath('../TPower_1.0');
+addpath('../TPower_1.0/algorithms/TPower/');
+addpath('../TPower_1.0/misc/');
 
 %% Experimental Setting
-n=5000;
+n=500;
 p=15;
 sigma=0;
-lambda=0.1;
+lambda=0.5;
 
 %% Covariance and design matrix
 rho1 = 0.7;
@@ -68,7 +71,7 @@ keyboard;
 param.f=4;
 param.diag=0;
 param.PSD=true;
-param.max_nb_main_loop=300;
+param.max_nb_main_loop=100;
 param.powerIter=100;
 param.stPtPowerIter=1000;
 param.niterPS=10000;%5000
@@ -155,3 +158,20 @@ caxis([0, 0.3]);
 colorbar;
 pbaspect([(3*p+10)/p 1 1]);
 
+%%
+figure(6);clf
+nplots=length(ActiveSet_as.matrix_atoms)+2;
+ncol=ceil(sqrt(nplots));
+nrow=ceil(nplots/ncol);
+iplot=1;
+M=zeros(p);
+while iplot<nplots-1
+subplot(nrow,ncol,iplot);
+imagesc(abs(ActiveSet_as.alpha(iplot)*ActiveSet_as.matrix_atoms{iplot}));
+M=M+ActiveSet_as.alpha(iplot)*ActiveSet_as.matrix_atoms{iplot};
+iplot=iplot+1;
+end
+subplot(nrow,ncol,iplot);
+imagesc(abs(M));
+subplot(nrow,ncol,iplot);
+imagesc(abs(M+diag(D_as)));

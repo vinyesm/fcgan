@@ -122,6 +122,7 @@ while cont
         %% update D
         covariance=inputData.X1^2;
         D=diag(covariance^2-covariance*Z*covariance)\(covariance.^2);
+        D=D.*(D>0);
         if param.sloppy==0 || (param.sloppy~=0 && mod(count,10)==1)
             [loss(i),pen(i),obj(i),dg(i),time(i)]=get_val_lgm_asqp(Z,D,ActiveSet,inputData,param,cardVal);
             nb_pivot(i)=npiv;
@@ -137,7 +138,6 @@ while cont
     
     %% get new atom
     if cont
-        YStart=inputData.Y;
         inputData.Y= YStart - inputData.X1*diag(D)*inputData.X2;
         [new_i, new_val, maxval]=get_new_atom_spca(Z,ActiveSet,param,inputData);
         ActiveSet.atom_count = ActiveSet.atom_count +1;
@@ -178,7 +178,15 @@ while cont
         new_atom_added=true;
         first_pass=false;
         
-        if maxval<0
+        if 1
+            g=H*[ActiveSet.alpha;0]+f;
+            if g(end)>0
+                fprintf('The new atom direction is not a descent direction\n');
+                keyboard;
+            end
+        end
+        
+        if maxval<param.lambda %0
             error('\nNegative directional derivative d=%f\n',maxval);
         end
         

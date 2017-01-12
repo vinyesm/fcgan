@@ -120,7 +120,7 @@ hist.time=toc;
 %update D
 covariance=inputData.X1^2;
 D=diag(covariance^2-covariance*Z*covariance)\(covariance.^2);
-
+D=D.*(D>0);
 
 
 %%
@@ -212,7 +212,7 @@ while c
     
     if takenI
         fprintf('This support has already been added. Stopping\n\n');
-        %c=0;
+%         c=0;
     elseif varIJ > param.lambda*(1+param.epsStop / kBest)* param.cardfun(kBest)
         ActiveSet.I = [ActiveSet.I, currI];
         ActiveSet.U = [ActiveSet.U, full(u(currI))];
@@ -245,5 +245,13 @@ hist.obj_sup = obj_sup;
 hist.nb_pivot= nb_pivot;
 hist.active_var= active_var;
 
+if length(ActiveSet.alpha)~=ActiveSet.atom_count
+    fprintf('error : length of alpha different from nb of atoms\n');
+    keyboard;
+end
+%% from atoms to matrices
+ActiveSet.matrix_atoms={};
+for i=1:ActiveSet.atom_count
+ActiveSet.matrix_atoms{i}=ActiveSet.atoms(:,i)*ActiveSet.atoms(:,i)';
 end
 
